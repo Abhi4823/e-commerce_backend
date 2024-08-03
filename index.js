@@ -20,8 +20,9 @@ const URI = process.env.MongoDBURI;
 
 // Connect to MongoDB
 mongoose.connect(URI)
-    .then(() => console.log("Connected to MongoDB"))
-    .catch((error) => console.error("Error connecting to MongoDB:", error));
+.then(() => console.log("Connected to MongoDB"))
+.catch((error) => console.error("Error connecting to MongoDB:", error));
+
 
 // Create the upload directory if it doesn't exist
 const uploadDir = path.join(__dirname, 'upload/images');
@@ -38,26 +39,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Middleware to verify JWT tokens
-const verifyToken = (req, res, next) => {
-    const token = req.header('auth-token');
-    if (!token) {
-        return res.status(401).json({ error: 'Please authenticate with a valid token' });
-    }
-    try {
-        const decoded = jwt.verify(token, 'secret_ecom');
-        req.user = decoded;
-        next();
-    } catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
-};
-
-// Serve static files from the 'upload/images' directory with authentication
-app.use('/images', verifyToken, express.static(uploadDir));
+// Serve static files from the 'upload/images' directory
+app.use('/images', express.static(uploadDir));
 
 // Route for file upload
-app.post("/upload", verifyToken, upload.single('product'), (req, res) => {
+app.post("/upload", upload.single('product'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, message: "No file uploaded" });
     }
@@ -172,7 +158,7 @@ app.post('/signup', async (req, res) => {
 });
 
 // Route to add product
-app.post('/addproduct', verifyToken, async (req, res) => {
+app.post('/addproduct', async (req, res) => {
     try {
         let products = await Product.find({});
         let id = products.length > 0 ? products[products.length - 1].id + 1 : 1;
@@ -198,7 +184,7 @@ app.post('/addproduct', verifyToken, async (req, res) => {
 });
 
 // Route to delete product
-app.post('/removeproduct', verifyToken, async (req, res) => {
+app.post('/removeproduct', async (req, res) => {
     try {
         const result = await Product.findOneAndDelete({ id: req.body.id });
         if (!result) {
@@ -325,8 +311,7 @@ app.get('/getcart', fetchUser, async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to fetch cart data" });
     }
 });
-
-// Endpoint to remove data from cart
+//creating end point to remove data from cart
 app.post('/removefromcart', fetchUser, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -348,16 +333,12 @@ app.post('/removefromcart', fetchUser, async (req, res) => {
     }
 });
 
-// Endpoint for getting user cart data (post method)
 app.post('/getcart', fetchUser, async (req, res) => {
-    try {
-        let userData = await User.findOne({ _id: req.user.id });
-        res.json(userData.cartData);
-    } catch (error) {
-        console.error("Error fetching cart data:", error);
-        res.status(500).json({ success: false, message: "Failed to fetch cart data" });
-    }
+    console.log("GetCart");
+    let userData = await User.findOne({ _id: req.user.id });
+    res.json(userData.cartData);
 });
+
 
 // Start server
 app.listen(port, () => {
