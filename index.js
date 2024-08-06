@@ -230,7 +230,7 @@ app.post('/login', async (req, res) => {
         }
 
         // Create and send a JWT token
-        const token = jwt.sign({ id: user._id }, TOKEN, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id }, 'new_secret_key', { expiresIn: '1h' });
         res.json({ success: true, token });
     } catch (error) {
         console.error("Error logging in user:", error);
@@ -269,7 +269,7 @@ const fetchUser = async (req, res, next) => {
         return res.status(401).json({ error: 'Please authenticate with a valid token' });
     }
     try {
-        const data = jwt.verify(token, TOKEN);
+        const data = jwt.verify(token, 'new_secret_key');
         req.user = data;
         next();
     } catch (error) {
