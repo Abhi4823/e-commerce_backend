@@ -150,7 +150,7 @@ app.post('/signup', async (req, res) => {
         await user.save();
 
         // Create and send a JWT token
-        const token = jwt.sign({ id: user._id }, TOKEN, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id },TOKEN, { expiresIn: '1h' });
         res.json({ success: true, token });
     } catch (error) {
         console.error("Error signing up user:", error);
@@ -230,7 +230,7 @@ app.post('/login', async (req, res) => {
         }
 
         // Create and send a JWT token
-        const token = jwt.sign({ id: user._id }, 'secret_ecom', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id }, 'new_secret_key', { expiresIn: '1h' });
         res.json({ success: true, token });
     } catch (error) {
         console.error("Error logging in user:", error);
@@ -269,7 +269,7 @@ const fetchUser = async (req, res, next) => {
         return res.status(401).json({ error: 'Please authenticate with a valid token' });
     }
     try {
-        const data = jwt.verify();
+        const data = jwt.verify(token, 'new_secret_key');
         req.user = data;
         next();
     } catch (error) {
@@ -339,7 +339,6 @@ app.post('/getcart', fetchUser, async (req, res) => {
     let userData = await User.findOne({ _id: req.user.id });
     res.json(userData.cartData);
 });
-
 
 // Start server
 app.listen(port, () => {
