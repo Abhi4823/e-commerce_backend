@@ -50,7 +50,7 @@ app.post("/upload", upload.single('product'), (req, res) => {
     }
     res.json({
         success: true,
-        image_url: `https://e-commerce-web-1-w74e.onrender.com/images/${req.file.filename}`
+        image_url: `https://e-commerce-backend-9goh.onrender.com/images/${req.file.filename}`
     });
 });
 
@@ -230,7 +230,7 @@ app.post('/login', async (req, res) => {
         }
 
         // Create and send a JWT token
-        const token = jwt.sign({ id: user._id }, TOKEN, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user._id },TOKEN , { expiresIn: '1h' });
         res.json({ success: true, token });
     } catch (error) {
         console.error("Error logging in user:", error);
